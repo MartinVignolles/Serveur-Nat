@@ -11,4 +11,10 @@ services:
             context: ./nginx
         ports:
             - "80:80"
+    api-node:
+        restart: always
+        build:
+            context: ./api-node/api-node
+        ports:
+            - "3000:3000"
 
