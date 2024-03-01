@@ -15,10 +15,10 @@ EXPOSE 22
 ARG pi_folder
 
 # Copier le fichier de configuration NGINX personnalisé dans le conteneur
-#COPY ./docker-raspberry-nginx/nginx/${pi_folder}/default.conf /etc/nginx/conf.d/default.conf
+COPY ./nginxrspb/${pi_folder}/default.conf /etc/nginx/conf.d/default.conf
 
 # Copier le contenu du site web dans le conteneur
-COPY nginx/${pi_folder}/index.html /var/www/html/
+COPY ./nginxrspb/${pi_folder}/index.html /var/www/html/
 
 # Copier les clés SSH dans le conteneur
 COPY ssh-keys/* /root/.ssh/
@@ -30,7 +30,7 @@ RUN chmod 600 /root/.ssh/*
 COPY startup.sh /startup.sh
 
 # Rendez le script exécutable
-RUN chmod +x startup.sh
+RUN chmod +x /startup.sh
 
 # Lancer NGINX en premier plan
-CMD ["startup.sh","nginx", "-g", "daemon off;"]
+CMD ["bash","/startup.sh"]
