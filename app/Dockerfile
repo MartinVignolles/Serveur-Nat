@@ -4,6 +4,9 @@ FROM node:alpine
 # create the directory inside the container
 WORKDIR /usr/src/app
 
+# Install net-tools (containing netstat) using apk
+RUN apk --update add net-tools
+
 # copy the package.json files from local machine to the workdir in container
 COPY package*.json ./
 

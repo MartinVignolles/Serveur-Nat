@@ -17,4 +17,32 @@ services:
             context: ./api-node/api-node
         ports:
             - "3000:3000"
+    serveur_ssh:
+        build: 
+            context: ./docker-raspberry-nginx/serveur_ssh
+        ports:
+        - "22:22"
+      
+    raspberry_pi_1:
+        build:
+            dockerfile: ./docker-raspberry-nginx/Dockerfile
+            args:
+                pi_folder: pi1
+        ports:
+        - "8081:80"
 
+    # raspberry_pi_2:
+    #     build:
+    #         context: ./docker-raspberry-nginx
+    #         args:
+    #             pi_folder: pi2
+    #     ports:
+    #     - "8082:80"
+
+    raspberry_pi_3:
+        build:
+            dockerfile: ./docker-raspberry-nginx/Dockerfile
+            args:
+                pi_folder: pi3
+        ports:
+        - "8083:80"
