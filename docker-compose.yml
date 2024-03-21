@@ -1,10 +1,10 @@
 version: "3.8"
 services:
-    nodeserver:
-        build:
-            context: ./app
-        ports:
-            - "5000:5000"
+    # nodeserver:
+    #     build:
+    #         context: ./app
+    #     ports:
+    #         - "5000:5000"
     db:
         image: mysql
         command: 
@@ -27,12 +27,13 @@ services:
         networks:
             - app-network
 
-    # api-node:
-    #     restart: always
-    #     build:
-    #         context: ./api-node/api-node
-    #     ports:
-    #         - "3000:3000"
+    api-node:
+        build:
+            context: ./api-node/api-node
+        ports:
+            - "3000:3000"
+        networks:
+            - app-network
       
     # raspberry_pi_1:
     #     build:
