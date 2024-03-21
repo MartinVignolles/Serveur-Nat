@@ -5,44 +5,56 @@ services:
             context: ./app
         ports:
             - "5000:5000"
-    nginx:
+    db:
+        image: mysql
+        command: --default-authentication-plugin=mysql_native_password
         restart: always
-        build:
-            context: ./nginx
+        environment:
+            MYSQL_DATABASE: ports
+            MYSQL_USER: root
+            MYSQL_ROOT_PASSWORD: matias
+        networks:
+            - app-network
+
+    adminer:
+        image: adminer
+        restart: always
         ports:
-            - "80:80"
+            - 8080:8080
+        networks:
+            - app-network
+
     api-node:
         restart: always
         build:
             context: ./api-node/api-node
         ports:
             - "3000:3000"
-    serveur_ssh:
-        build: 
-            context: ./serveur_ssh
-        ports:
-        - "22:22"
       
-    raspberry_pi_1:
-        build:
-            dockerfile: Dockerfile
-            args:
-                pi_folder: pi1
-        ports:
-        - "8081:80"
+    # raspberry_pi_1:
+    #     build:
+    #         dockerfile: Dockerfile
+    #         args:
+    #             pi_folder: pi1
+    #     ports:
+    #     - "8081:80"
 
-    raspberry_pi_2:
-        build:
-            dockerfile: Dockerfile
-            args:
-                pi_folder: pi2
-        ports:
-        - "8082:80"
+    # raspberry_pi_2:
+    #     build:
+    #         dockerfile: Dockerfile
+    #         args:
+    #             pi_folder: pi2
+    #     ports:
+    #     - "8082:80"
 
-    raspberry_pi_3:
-        build:
-            dockerfile: Dockerfile
-            args:
-                pi_folder: pi3
-        ports:
-        - "8083:80"
+    # raspberry_pi_3:
+    #     build:
+    #         dockerfile: Dockerfile
+    #         args:
+    #             pi_folder: pi3
+    #     ports:
+    #     - "8083:80"
+
+networks:
+    app-network:
+        driver: bridge
