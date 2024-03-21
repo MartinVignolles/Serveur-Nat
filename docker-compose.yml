@@ -7,14 +7,17 @@ services:
             - "5000:5000"
     db:
         image: mysql
-        command: --default-authentication-plugin=mysql_native_password
+        command: 
+            --default-authentication-plugin=mysql_native_password 
+            --init-file /docker-entrypoint-initdb.d/init.sql
         restart: always
         environment:
-            MYSQL_DATABASE: ports
             MYSQL_USER: root
             MYSQL_ROOT_PASSWORD: matias
         networks:
             - app-network
+        volumes:
+            - ./mysql-scripts:/docker-entrypoint-initdb.d
 
     adminer:
         image: adminer
@@ -24,12 +27,12 @@ services:
         networks:
             - app-network
 
-    api-node:
-        restart: always
-        build:
-            context: ./api-node/api-node
-        ports:
-            - "3000:3000"
+    # api-node:
+    #     restart: always
+    #     build:
+    #         context: ./api-node/api-node
+    #     ports:
+    #         - "3000:3000"
       
     # raspberry_pi_1:
     #     build:
