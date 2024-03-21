@@ -5,23 +5,34 @@ services:
             context: ./app
         ports:
             - "5000:5000"
-    nginx:
-        restart: always
-        build:
-            context: ./nginx
+    traefik:
+        image: "traefik:v2.11"
+        container_name: "traefik"
+        command:
+        #- "--log.level=DEBUG"
+        - "--api.insecure=true"
+        - "--providers.docker=true"
+        - "--providers.docker.exposedbydefault=false"
+        - "--entrypoints.web.address=:80"
         ports:
-            - "80:80"
+        - "80:80"
+        - "8080:8080"
+        volumes:
+        - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+    whoami:
+        image: "traefik/whoami"
+        container_name: "simple-service"
+        labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.whoami.rule=Host(`whoami.localhost`)"
+        - "traefik.http.routers.whoami.entrypoints=web"
     api-node:
         restart: always
         build:
             context: ./api-node/api-node
         ports:
             - "3000:3000"
-    serveur_ssh:
-        build: 
-            context: ./serveur_ssh
-        ports:
-        - "22:22"
       
     raspberry_pi_1:
         build:
@@ -46,3 +57,4 @@ services:
                 pi_folder: pi3
         ports:
         - "8083:80"
+
