@@ -10,7 +10,7 @@ const connection = mysql.createConnection({
     host: 'db',
     user: 'root',
     password: 'matias',
-    database: 'ports'
+    database: 'db_airlux'
 });
 
 app.post('/getPort', async (req, res) => {
@@ -52,7 +52,7 @@ app.post('/getPort', async (req, res) => {
             })
             .catch(error => {
               console.error('Erreur lors de l\'appel à l\'API externe :', error);
-              res.status(500).json({ error: 'Erreur lors de l\'appel à l\'API externe' });
+              res.status(500). b({ error: 'Erreur lors de l\'appel à l\'API externe' });
             });
         }
       }

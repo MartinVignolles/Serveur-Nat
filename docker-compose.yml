@@ -12,7 +12,7 @@ services:
             --init-file /docker-entrypoint-initdb.d/init.sql
         restart: always
         environment:
-            MYSQL_USER: root
+            MYSQL_USER: mysql
             MYSQL_ROOT_PASSWORD: matias
         volumes:
             - ./mysql-scripts:/docker-entrypoint-initdb.d
