@@ -1,0 +1,9 @@
+CREATE DATABASE db_airlux;
+
+USE db_airlux;
+
+CREATE TABLE IF NOT EXISTS ports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mac_adresse VARCHAR(17) NOT NULL,
+    port INT NOT NULL
+);

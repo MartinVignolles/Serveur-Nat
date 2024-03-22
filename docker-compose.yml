@@ -12,11 +12,12 @@ services:
     db:
         image: mysql
         container_name: database
-        #command: --default-authentication-plugin=mysql_native_password
+        command: 
+            --default-authentication-plugin=mysql_native_password 
+            --init-file /docker-entrypoint-initdb.d/init.sql
         restart: always
         environment:
-            MYSQL_DATABASE: ports
-            MYSQL_USER: root
+            MYSQL_USER: mysql
             MYSQL_ROOT_PASSWORD: matias
         networks:
             - traefik_network
@@ -29,6 +30,7 @@ services:
             - 8089:8080
         networks:
             - traefik_network
+            
     api-node:
         restart: always
         build:
