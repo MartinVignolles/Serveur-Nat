@@ -2,7 +2,20 @@
 FROM arm32v7/ubuntu:latest
 
 # Mettre à jour les paquets, installer NGINX et SSH
-RUN apt-get update && apt-get install -y nginx openssh-server
+RUN apt-get update && apt-get install -y nginx openssh-server ssh
+
+RUN apt-get update && apt-get install -y \
+    iputils-ping \
+    net-tools
+
+# Créez le dossier .ssh et copiez la clé privée
+RUN mkdir /root/.ssh
+COPY ./ssh-keys/id_rsa /root/.ssh/id_rsa
+COPY ./ssh-keys/id_rsa.pub /root/.ssh/id_rsa
+
+# Assurez-vous que la clé privée est sécurisée
+RUN chmod 600 /root/.ssh/id_rsa
+
 
 # Supprimer le fichier de configuration NGINX par défaut et les fichiers de site par défaut
 RUN rm /etc/nginx/sites-enabled/default && rm -rf /var/www/html/*

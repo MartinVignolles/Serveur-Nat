@@ -1,48 +1,110 @@
 version: "3.8"
 services:
     nodeserver:
+        container_name: serveur
         build:
             context: ./app
         ports:
-            - "5000:5000"
-    nginx:
+            - "2222:22"
+        networks:
+            - traefik_network
+
+    db:
+        image: mysql
+        container_name: database
+        #command: --default-authentication-plugin=mysql_native_password
         restart: always
-        build:
-            context: ./nginx
+        environment:
+            MYSQL_DATABASE: ports
+            MYSQL_USER: root
+            MYSQL_ROOT_PASSWORD: matias
+        networks:
+            - traefik_network
+
+    adminer:
+        container_name: adminer
+        image: adminer
+        restart: always
         ports:
-            - "80:80"
+            - 8089:8080
+        networks:
+            - traefik_network
     api-node:
         restart: always
         build:
             context: ./api-node/api-node
         ports:
             - "3000:3000"
-    serveur_ssh:
-        build: 
-            context: ./serveur_ssh
+        networks:
+            - traefik_network
+
+    traefik:
+        image: "traefik:v2.11"
+        container_name: "traefik"
+        command:
+            - "--log.level=DEBUG"
+            - "--api.insecure=true"  
+            - "--providers.docker=true"
+            - "--providers.docker.exposedbydefault=false"
+            - "--entrypoints.web.address=:80"
+            - "--entrypoints.websecure.address=:443"
+            - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+            - "--certificatesresolvers.myresolver.acme.email=contact@mon-domaine.com"
+            - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json" 
         ports:
-        - "22:22"
+            - "80:80"
+            - "443:443"
+            - "8080:8080"
+        volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock:ro"
+            - "./letsencrypt:/letsencrypt"
+        networks:
+            - traefik_network
+
+    whoami:
+        image: "traefik/whoami"
+        container_name: "simple-service"
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.whoami.rule=Host(`whoami.localhost`)"
+            - "traefik.http.routers.whoami.entrypoints=websecure"
+            - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+        networks:
+            - traefik_network
       
     raspberry_pi_1:
+        container_name: raspberry_1
         build:
             dockerfile: Dockerfile
             args:
                 pi_folder: pi1
         ports:
         - "8081:80"
+        networks:
+            - traefik_network
 
     raspberry_pi_2:
+        container_name: raspberry_2
         build:
             dockerfile: Dockerfile
             args:
                 pi_folder: pi2
         ports:
         - "8082:80"
+        networks:
+            - traefik_network
 
     raspberry_pi_3:
+        container_name: raspberry_3
         build:
             dockerfile: Dockerfile
             args:
                 pi_folder: pi3
         ports:
         - "8083:80"
+        networks:
+            - traefik_network
+
+networks:
+  traefik_network:
+    driver: bridge
