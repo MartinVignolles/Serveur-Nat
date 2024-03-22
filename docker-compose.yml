@@ -19,6 +19,8 @@ services:
         environment:
             MYSQL_USER: mysql
             MYSQL_ROOT_PASSWORD: matias
+        volumes:
+            - ./mysql-scripts:/docker-entrypoint-initdb.d
         networks:
             - traefik_network
 
@@ -28,15 +30,6 @@ services:
         restart: always
         ports:
             - 8089:8080
-        networks:
-            - traefik_network
-            
-    api-node:
-        restart: always
-        build:
-            context: ./api-node/api-node
-        ports:
-            - "3000:3000"
         networks:
             - traefik_network
 
