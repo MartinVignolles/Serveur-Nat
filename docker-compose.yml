@@ -5,7 +5,7 @@ services:
         build:
             context: ./app
         ports:
-            - "2222:22"
+            - "5000:5000"
         networks:
             - traefik_network
 
