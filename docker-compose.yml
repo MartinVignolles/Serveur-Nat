@@ -22,33 +22,27 @@ services:
         restart: always
         ports:
             - 8080:8080
-
-    # api-node:
-    #     build:
-    #         context: ./api-node/api-node
-    #     ports:
-    #         - "3000:3000"
       
-    # raspberry_pi_1:
-    #     build:
-    #         dockerfile: Dockerfile
-    #         args:
-    #             pi_folder: pi1
-    #     ports:
-    #     - "8081:80"
+    raspberry_pi_1:
+        build:
+            dockerfile: Dockerfile
+            args:
+                pi_folder: pi1
+        ports:
+        - "8081:80"
 
-    # raspberry_pi_2:
-    #     build:
-    #         dockerfile: Dockerfile
-    #         args:
-    #             pi_folder: pi2
-    #     ports:
-    #     - "8082:80"
+    raspberry_pi_2:
+        build:
+            dockerfile: Dockerfile
+            args:
+                pi_folder: pi2
+        ports:
+        - "8082:80"
 
-    # raspberry_pi_3:
-    #     build:
-    #         dockerfile: Dockerfile
-    #         args:
-    #             pi_folder: pi3
-    #     ports:
-    #     - "8083:80"
+    raspberry_pi_3:
+        build:
+            dockerfile: Dockerfile
+            args:
+                pi_folder: pi3
+        ports:
+        - "8083:80"
