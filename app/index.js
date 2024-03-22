@@ -14,7 +14,22 @@ const connection = mysql.createConnection({
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+
+  const queryUse = connection.query('USE db_airlux', (err, result) => {
+    if (err) {
+        console.error('Erreur lors de l\'ajout de données:', err);
+        return res.status(500).send('Erreur lors de l\'ajout de données');
+    }
+    console.log('Connecté à db_airlux');
+  });
+
+  const querySelect = connection.query('SELECT * FROM ports ', async (err, result) => {
+    message = 'Heeeello <br>';
+    result.forEach(element => {
+      message += 'Mac_adresse : '+ element.mac_adresse +' -> Link : http://localhost:' + element.port + '<br>';
+    });
+    res.status(200).send(message)
+  });
 });
 
 app.get('/port', async (req, res) => {
