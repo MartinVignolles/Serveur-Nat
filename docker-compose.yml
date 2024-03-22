@@ -38,27 +38,27 @@ services:
           - traefik_network
     
     traefik:
-    image: "traefik:v2.11"
-    container_name: "traefik"
-    command:
-      - "--log.level=DEBUG"
-      - "--api.insecure=true"  
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=contact@mon-domaine.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json" 
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./letsencrypt:/letsencrypt"
-    networks:
-      - traefik_network
+      image: "traefik:v2.11"
+      container_name: "traefik"
+      command:
+        - "--log.level=DEBUG"
+        - "--api.insecure=true"  
+        - "--providers.docker=true"
+        - "--providers.docker.exposedbydefault=false"
+        - "--entrypoints.web.address=:80"
+        - "--entrypoints.websecure.address=:443"
+        - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+        - "--certificatesresolvers.myresolver.acme.email=contact@mon-domaine.com"
+        - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json" 
+      ports:
+        - "80:80"
+        - "443:443"
+        - "8080:8080"
+      volumes:
+        - "/var/run/docker.sock:/var/run/docker.sock:ro"
+        - "./letsencrypt:/letsencrypt"
+      networks:
+        - traefik_network
 
     whoami:
       image: "traefik/whoami"
@@ -75,7 +75,7 @@ services:
       build:
         dockerfile: Dockerfile
         args:
-        pi_folder: pi1
+          pi_folder: pi1
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.raspberry_pi_1.rule=Host(`raspberry-pi-1.localhost`)"
@@ -86,35 +86,35 @@ services:
       networks:
         - traefik_network
 
-  raspberry_pi_2:
-    build:
-      dockerfile: Dockerfile
-      args:
-        pi_folder: pi2
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.raspberry_pi_2.rule=Host(`raspberry-pi-2.localhost`)"
-      - "traefik.http.routers.raspberry_pi_2.entrypoints=websecure"
-      - "traefik.http.routers.raspberry_pi_2.tls.certresolver=myresolver"
-    ports:
-      - "8082:80"
-    networks:
-      - traefik_network
+    raspberry_pi_2:
+      build:
+        dockerfile: Dockerfile
+        args:
+          pi_folder: pi2
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.raspberry_pi_2.rule=Host(`raspberry-pi-2.localhost`)"
+        - "traefik.http.routers.raspberry_pi_2.entrypoints=websecure"
+        - "traefik.http.routers.raspberry_pi_2.tls.certresolver=myresolver"
+      ports:
+        - "8082:80"
+      networks:
+        - traefik_network
 
-  raspberry_pi_3:
-    build:
-      dockerfile: Dockerfile
-      args:
-        pi_folder: pi3
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.raspberry_pi_3.rule=Host(`raspberry-pi-3.localhost`)"
-      - "traefik.http.routers.raspberry_pi_3.entrypoints=websecure"
-      - "traefik.http.routers.raspberry_pi_3.tls.certresolver=myresolver"
-    ports:
-      - "8083:80"
-    networks:
-      - traefik_network
+    raspberry_pi_3:
+      build:
+        dockerfile: Dockerfile
+        args:
+          pi_folder: pi3
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.raspberry_pi_3.rule=Host(`raspberry-pi-3.localhost`)"
+        - "traefik.http.routers.raspberry_pi_3.entrypoints=websecure"
+        - "traefik.http.routers.raspberry_pi_3.tls.certresolver=myresolver"
+      ports:
+        - "8083:80"
+      networks:
+        - traefik_network
 
 networks:
   traefik_network:
