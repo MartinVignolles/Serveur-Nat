@@ -1,10 +1,10 @@
 version: "3.8"
 services:
-    # nodeserver:
-    #     build:
-    #         context: ./app
-    #     ports:
-    #         - "5000:5000"
+    nodeserver:
+        build:
+            context: ./app
+        ports:
+            - "5000:5000"
     db:
         image: mysql
         command: 
@@ -14,8 +14,6 @@ services:
         environment:
             MYSQL_USER: root
             MYSQL_ROOT_PASSWORD: matias
-        networks:
-            - app-network
         volumes:
             - ./mysql-scripts:/docker-entrypoint-initdb.d
 
@@ -24,16 +22,12 @@ services:
         restart: always
         ports:
             - 8080:8080
-        networks:
-            - app-network
 
     api-node:
         build:
             context: ./api-node/api-node
         ports:
             - "3000:3000"
-        networks:
-            - app-network
       
     # raspberry_pi_1:
     #     build:
@@ -58,7 +52,3 @@ services:
     #             pi_folder: pi3
     #     ports:
     #     - "8083:80"
-
-networks:
-    app-network:
-        driver: bridge
