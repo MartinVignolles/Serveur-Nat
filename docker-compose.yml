@@ -1,19 +1,43 @@
 version: "3.8"
 services:
-  nodeserver:
-    build:
-      context: ./app
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.nodeserver.rule=Host(`nodeserver.localhost`)"
-      - "traefik.http.routers.nodeserver.entrypoints=websecure"
-      - "traefik.http.routers.nodeserver.tls.certresolver=myresolver"
-    ports:
-      - "5000:5000"
-    networks:
-      - traefik_network
+    nodeserver:
+        build:
+            context: ./app
+        labels:
+          - "traefik.enable=true"
+          - "traefik.http.routers.nodeserver.rule=Host(`nodeserver.localhost`)"
+          - "traefik.http.routers.nodeserver.entrypoints=websecure"
+          - "traefik.http.routers.nodeserver.tls.certresolver=myresolver"
+        ports:
+          - "5000:5000"
+        networks:
+          - traefik_network
 
-  traefik:
+    db:
+        image: mysql
+        container_name: database
+        command: 
+            --default-authentication-plugin=mysql_native_password 
+            --init-file /docker-entrypoint-initdb.d/init.sql
+        restart: always
+        environment:
+            MYSQL_USER: mysql
+            MYSQL_ROOT_PASSWORD: matias
+        volumes:
+            - ./mysql-scripts:/docker-entrypoint-initdb.d
+        networks:
+            - traefik_network
+
+    adminer:
+      container_name: adminer
+      image: adminer
+      restart: always
+      ports:
+          - 8089:8080
+      networks:
+          - traefik_network
+    
+    traefik:
     image: "traefik:v2.11"
     container_name: "traefik"
     command:
@@ -36,45 +60,31 @@ services:
     networks:
       - traefik_network
 
-  whoami:
-    image: "traefik/whoami"
-    container_name: "simple-service"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`whoami.localhost`)"
-      - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
-    networks:
-      - traefik_network
+    whoami:
+      image: "traefik/whoami"
+      container_name: "simple-service"
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.whoami.rule=Host(`whoami.localhost`)"
+        - "traefik.http.routers.whoami.entrypoints=websecure"
+        - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+      networks:
+        - traefik_network
 
-  api-node:
-    restart: always
-    build:
-      context: ./api-node/api-node
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.api-node.rule=Host(`api-node.localhost`)"
-      - "traefik.http.routers.api-node.entrypoints=websecure"
-      - "traefik.http.routers.api-node.tls.certresolver=myresolver"
-    ports:
-      - "3000:3000"
-    networks:
-      - traefik_network
-
-  raspberry_pi_1:
-    build:
-      dockerfile: Dockerfile
-      args:
+    raspberry_pi_1:
+      build:
+        dockerfile: Dockerfile
+        args:
         pi_folder: pi1
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.raspberry_pi_1.rule=Host(`raspberry-pi-1.localhost`)"
-      - "traefik.http.routers.raspberry_pi_1.entrypoints=websecure"
-      - "traefik.http.routers.raspberry_pi_1.tls.certresolver=myresolver"
-    ports:
-      - "8081:80"
-    networks:
-      - traefik_network
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.raspberry_pi_1.rule=Host(`raspberry-pi-1.localhost`)"
+        - "traefik.http.routers.raspberry_pi_1.entrypoints=websecure"
+        - "traefik.http.routers.raspberry_pi_1.tls.certresolver=myresolver"
+      ports:
+        - "8081:80"
+      networks:
+        - traefik_network
 
   raspberry_pi_2:
     build:
