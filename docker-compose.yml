@@ -51,7 +51,7 @@ services:
       - "--accesslog=true"   # Activer les logs d'accÃ¨s
       - "--accesslog.filepath=/var/log/traefik/access.log" 
     ports:
-      - "80:80"
+      - "100:100"
       - "443:443"
       - "8080:8080"
     volumes:
