@@ -5,9 +5,10 @@ FROM node:alpine
 WORKDIR /usr/src/app
 
 # Update package lists and install net-tools (containing netstat) and other utilities
-RUN apt-get update && \
-    apt-get install -y net-tools iputils-ping sed openssh-server && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk update && \
+    apk add --no-cache net-tools iputils sed openssh-server && \
+    rm -rf /var/cache/apk/*
+
 
 ADD authorizer.sh /authorizer.sh
 
