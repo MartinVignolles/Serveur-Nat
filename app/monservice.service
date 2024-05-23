@@ -1,0 +1,9 @@
+[Unit]
+Description=Mon Service Systemd
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/authorizer.sh %i
+
+[Install]
+WantedBy=multi-user.target

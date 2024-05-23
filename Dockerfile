@@ -6,15 +6,8 @@ RUN apt-get update && apt-get install -y nginx openssh-server ssh
 
 RUN apt-get update && apt-get install -y \
     iputils-ping \
-    net-tools
-
-# Créez le dossier .ssh et copiez la clé privée
-RUN mkdir /root/.ssh
-COPY ./ssh-keys/id_rsa /root/.ssh/id_rsa
-COPY ./ssh-keys/id_rsa.pub /root/.ssh/id_rsa
-
-# Assurez-vous que la clé privée est sécurisée
-RUN chmod 600 /root/.ssh/id_rsa
+    net-tools \
+    curl 
 
 
 # Supprimer le fichier de configuration NGINX par défaut et les fichiers de site par défaut
@@ -32,12 +25,6 @@ COPY ./nginxrspb/${pi_folder}/default.conf /etc/nginx/conf.d/default.conf
 
 # Copier le contenu du site web dans le conteneur
 COPY ./nginxrspb/${pi_folder}/index.html /var/www/html/
-
-# Copier les clés SSH dans le conteneur
-COPY ssh-keys/* /root/.ssh/
-
-# Réglage des permissions des clés SSH
-RUN chmod 600 /root/.ssh/*
 
 # Copiez le script de démarrage dans l'image
 COPY startup.sh /startup.sh

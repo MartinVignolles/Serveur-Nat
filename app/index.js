@@ -3,6 +3,7 @@ const app = express();
 const portfinder = require('portfinder');
 const mysql = require('mysql');
 const axios = require('axios');
+const { exec } = require('child_process');
 
 const connection = mysql.createConnection({
   host: 'db',
@@ -19,6 +20,10 @@ app.get('/', (req, res) => {
 
 app.get('/port', async (req, res) => {
   const mac_adresse = req.body.mac_adresse;
+  const shh_pub_key = req.body.ssh_pub;
+  console.log("Mac adresse");
+  console.log(mac_adresse);
+  console.log("Mac adresse");
   const queryUse = connection.query('USE db_airlux', (err, result) => {
     if (err) {
         console.error('Erreur lors de l\'ajout de données:', err);
@@ -58,6 +63,27 @@ app.get('/port', async (req, res) => {
           } catch (err) {
             console.error('Erreur lors de la recherche de port :', err);
             res.status(500).send('Erreur lors de la recherche de port');
+          }
+          try {
+            //TODO appel scripts ajout clé ssh ICI
+            // Clé SSH en tant qu'argument
+            //const sshKey = 'ssh-rsa VOTRE_CLÉ_PUBLIQUE';
+            // Commande pour exécuter le script authorizer.sh avec la clé SSH comme argument
+            const command = `sh authorizer.sh ${shh_pub_key}`;
+            // Exécution de la commande
+            exec(command, (error, stdout, stderr) => {
+              if (error) {
+                console.error(`Erreur lors de l'exécution de la commande ssh-key : ${error}`);
+                return;
+              }
+              console.log(`Sortie standard : ${stdout}`);
+              console.error(`Sortie d'erreur : ${stderr}`);
+            });
+            
+          } catch (err) {
+            console.error('Erreur lors de l\'exécution de la commande ssh-key 2 :', err);
+            res.status(500).send('Erreur lors de la recherche de port');
+            
           }
         }
       }
