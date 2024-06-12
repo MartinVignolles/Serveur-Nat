@@ -14,17 +14,29 @@ services:
       - traefik_network
 
   influxdb:
-        image: influxdb:latest
-        container_name: influxdb
-        ports:
-        - "8086:8086"
-        volumes:
-        - influxdb_data:/var/lib/influxdb
-        environment:
-        - INFLUXDB_DB=mydb
-        - INFLUXDB_ADMIN_ENABLED=true
-        - INFLUXDB_ADMIN_USER=admin
-        - INFLUXDB_ADMIN_PASSWORD=adminpassword
+    image: influxdb:2.7
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=adminpassword
+      - DOCKER_INFLUXDB_INIT_ORG=my-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=my-bucket
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-secret-token
+    volumes:
+      - influxdb-storage:/var/lib/influxdb2
+
+  poke:
+    image: alpine:latest
+    container_name: poke
+    volumes:
+      - ./poke:/usr/src/app
+    working_dir: /usr/src/app
+    command: ["sh", "-c", "apk add --no-cache curl && sh poke.sh"]
+    depends_on:
+      - influxdb
 
   db:
     image: mysql
@@ -80,3 +92,5 @@ networks:
 
 volumes:
   influxdb_data:
+  influxdb-storage:
+  
