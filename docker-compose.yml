@@ -18,9 +18,9 @@ services:
     container_name: influxdb
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nodeserver.rule=Host(`influxdb.server-nat.duckdns.org`)"
-      - "traefik.http.routers.nodeserver.entrypoints=websecure"
-      - "traefik.http.routers.nodeserver.tls.certresolver=myresolver"
+      - "traefik.http.routers.influxdb.rule=Host(`influxdb.server-nat.duckdns.org`)"
+      - "traefik.http.routers.influxdb.entrypoints=websecure"
+      - "traefik.http.routers.influxdb.tls.certresolver=myresolver"
     ports:
       - "8086:8086"
     environment:
@@ -67,9 +67,9 @@ services:
     restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nodeserver.rule=Host(`adminer.server-nat.duckdns.org`)"
-      - "traefik.http.routers.nodeserver.entrypoints=websecure"
-      - "traefik.http.routers.nodeserver.tls.certresolver=myresolver"
+      - "traefik.http.routers.adminer.rule=Host(`adminer.server-nat.duckdns.org`)"
+      - "traefik.http.routers.adminer.entrypoints=websecure"
+      - "traefik.http.routers.adminer.tls.certresolver=myresolver"
     ports:
         - 8089:8080
     networks:
@@ -102,4 +102,3 @@ networks:
 volumes:
   influxdb_data:
   influxdb-storage:
-  
