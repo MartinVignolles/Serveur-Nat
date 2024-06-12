@@ -5,7 +5,7 @@ services:
       context: ./app
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nodeserver.rule=Host(`nodeserver.localhost`)"
+      - "traefik.http.routers.nodeserver.rule=Host(`nodeserver.server-nat.duckdns.org`)"
       - "traefik.http.routers.nodeserver.entrypoints=websecure"
       - "traefik.http.routers.nodeserver.tls.certresolver=myresolver"
     ports:
@@ -80,7 +80,7 @@ services:
       - ./traefik/acme.json:/etc/traefik/acme.json
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`)"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.server-nat.duckdns.org`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=web"
       - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
