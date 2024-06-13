@@ -5,26 +5,47 @@ services:
       context: ./app
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nodeserver.rule=Host(`nodeserver.localhost`)"
+      - "traefik.http.routers.nodeserver.rule=Host(`nodeserver.server-nat.duckdns.org`)"
       - "traefik.http.routers.nodeserver.entrypoints=websecure"
       - "traefik.http.routers.nodeserver.tls.certresolver=myresolver"
     ports:
       - "5000:5000"
     networks:
-      - traefik_network
+      - network_serveur
 
   influxdb:
-        image: influxdb:latest
-        container_name: influxdb
-        ports:
-        - "8086:8086"
-        volumes:
-        - influxdb_data:/var/lib/influxdb
-        environment:
-        - INFLUXDB_DB=mydb
-        - INFLUXDB_ADMIN_ENABLED=true
-        - INFLUXDB_ADMIN_USER=admin
-        - INFLUXDB_ADMIN_PASSWORD=adminpassword
+    image: influxdb:2.7
+    container_name: influxdb
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.influxdb.rule=Host(`influxdb.server-nat.duckdns.org`)"
+      - "traefik.http.routers.influxdb.entrypoints=websecure"
+      - "traefik.http.routers.influxdb.tls.certresolver=myresolver"
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=adminpassword
+      - DOCKER_INFLUXDB_INIT_ORG=my-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=my-bucket
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-secret-token
+    volumes:
+      - influxdb-storage:/var/lib/influxdb2
+    networks:
+        - network_serveur
+
+  poke:
+    image: alpine:latest
+    container_name: poke
+    volumes:
+      - ./poke:/usr/src/app
+    working_dir: /usr/src/app
+    command: ["sh", "-c", "apk add --no-cache curl && sh poke.sh"]
+    depends_on:
+      - influxdb
+    networks:
+        - network_serveur
 
   db:
     image: mysql
@@ -38,45 +59,46 @@ services:
     volumes:
         - ./mysql-scripts:/docker-entrypoint-initdb.d
     networks:
-        - traefik_network
+        - network_serveur
 
   adminer:
     container_name: adminer
     image: adminer
     restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.adminer.rule=Host(`adminer.server-nat.duckdns.org`)"
+      - "traefik.http.routers.adminer.entrypoints=websecure"
+      - "traefik.http.routers.adminer.tls.certresolver=myresolver"
     ports:
         - 8089:8080
     networks:
-        - traefik_network
+        - network_serveur
     
   traefik:
-    image: "traefik:v2.11"
-    container_name: "traefik"
-    command:
-      - "--log.level=DEBUG"
-      - "--api.insecure=true"  
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=contact@mon-domaine.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json" 
-      - "--accesslog=true"   # Activer les logs d'accÃ¨s
-      - "--accesslog.filepath=/var/log/traefik/access.log" 
+    image: traefik:v2.9
+    container_name: traefik
     ports:
-      - "100:100"
-      - "443:443"
-      - "8080:8080"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./letsencrypt:/letsencrypt"
-      - "./traefik/logs:/var/log/traefik"  
+      - "80:80"     # HTTP
+      - "443:443"   # HTTPS
+      - "8080:8080" # Traefik Dashboard
     networks:
-      - traefik_network
+      - network_serveur
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik/traefik.toml:/etc/traefik/traefik.toml
+      - ./traefik/acme.json:/etc/traefik/acme.json
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.server-nat.duckdns.org`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=web"
+      - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
 
 networks:
-  traefik_network:
+  network_serveur:
     driver: bridge
 
 volumes:
   influxdb_data:
+  influxdb-storage:
