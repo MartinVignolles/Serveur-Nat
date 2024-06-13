@@ -16,14 +16,6 @@ app.use(express.json());
 
 app.get('/', (req, res) => {
 
-  const queryUse = connection.query('USE db_airlux', (err, result) => {
-    if (err) {
-        console.error('Erreur lors de l\'ajout de données:', err);
-        return res.status(500).send('Erreur lors de l\'ajout de données');
-    }
-    console.log('Connecté à db_airlux');
-  });
-
   const querySelect = connection.query('SELECT * FROM ports ', async (err, result) => {
     message = 'Heeeello <br>';
     result.forEach(element => {
@@ -39,13 +31,6 @@ app.get('/port', async (req, res) => {
   console.log("Mac adresse");
   console.log(mac_adresse);
   console.log("Mac adresse");
-  const queryUse = connection.query('USE db_airlux', (err, result) => {
-    if (err) {
-        console.error('Erreur lors de l\'ajout de données:', err);
-        return res.status(500).send('Erreur lors de l\'ajout de données');
-    }
-    console.log('Connecté à db_airlux');
-  });
 
   try {
     // Vérifier si l'adresse MAC a déjà un port attribué
