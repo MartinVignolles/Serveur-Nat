@@ -4,6 +4,8 @@ const portfinder = require('portfinder');
 const mysql = require('mysql');
 const axios = require('axios');
 const { exec } = require('child_process');
+const path = require('path');
+const fs = require('fs');
 
 const connection = mysql.createConnection({
   host: 'db',
@@ -12,24 +14,31 @@ const connection = mysql.createConnection({
   database: 'db_airlux'
 });
 
-app.use(express.json());
+connection.connect((err) => {
+  if (err) {
+    console.error('Erreur de connexion : ' + err.stack);
+    return;
+  }
+  console.log('Connecté en tant que ID ' + connection.threadId);
+});
+
+//app.use(express.json());
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-
-  const queryUse = connection.query('USE db_airlux', (err, result) => {
-    if (err) {
-        console.error('Erreur lors de l\'ajout de données:', err);
-        return res.status(500).send('Erreur lors de l\'ajout de données');
-    }
-    console.log('Connecté à db_airlux');
-  });
-
-  const querySelect = connection.query('SELECT * FROM ports ', async (err, result) => {
+  connection.query('SELECT * FROM ports ', async (err, result) => {
     message = 'Heeeello <br>';
-    result.forEach(element => {
-      message += 'Mac_adresse : '+ element.mac_adresse +' -> Link : http://localhost:' + element.port + '<br>';
+    fs.readFile(path.join(__dirname, 'public', 'accueil.html'), 'utf8', (err, data) => {
+      if (err) {
+        res.status(500).send('Error reading index.html');
+        return;
+      }
+
+      // Injecter le message dans le contenu du fichier HTML
+      const updatedData = data.replace('<!-- Injected Content -->', message);
+      res.status(200).send(updatedData);
     });
-    res.status(200).send(message)
   });
 });
 
@@ -39,13 +48,6 @@ app.get('/port', async (req, res) => {
   console.log("Mac adresse");
   console.log(mac_adresse);
   console.log("Mac adresse");
-  const queryUse = connection.query('USE db_airlux', (err, result) => {
-    if (err) {
-        console.error('Erreur lors de l\'ajout de données:', err);
-        return res.status(500).send('Erreur lors de l\'ajout de données');
-    }
-    console.log('Connecté à db_airlux');
-  });
 
   try {
     // Vérifier si l'adresse MAC a déjà un port attribué

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirLux</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <h1>AirLux</h1>
+    <section id="dashboard">
+        <h2>Vue d'ensemble</h2>
+        <div id="notifications"></div>
+        <div id="status-overview">
+            <p>Température: <span id="temperature">22°C</span></p>
+            <p>Lumière: <span id="light-status">Éteinte</span></p>
+            <p>Sécurité: <span id="security-status">Activée</span></p>
+        </div>
+    </section>
+
+    <section id="controls">
+        <h2>Contrôle Centralisé</h2>
+        <button onclick="toggleLight()">Allumer/Éteindre Lumière</button>
+        <button onclick="setThermostat(25)">Régler Thermostat à 25°C</button>
+        <button onclick="toggleSecurity()">Activer/Désactiver Sécurité</button>
+    </section>
+
+    <section id="automation">
+        <h2>Automatisation et Programmation</h2>
+        <button onclick="createScene('nuit')">Créer Scène Nuit</button>
+    </section>
+
+    <section id="device-management">
+        <h2>Gestion des Appareils</h2>
+        <button onclick="addDevice()">Ajouter Appareil</button>
+        <button onclick="removeDevice()">Supprimer Appareil</button>
+    </section>
+</body>
+</html>
